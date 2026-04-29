@@ -1,13 +1,16 @@
 baseURL: 'https://electq.github.io/'
-languageCode: 'zh-cn'
 title: '东雲研究所'
 theme: 'PaperMod'
+defaultContentLanguage: 'zh-cn'
 
-# 文章URL格式
+languages:
+  zh-cn:
+    label: '简体中文'
+    weight: 1
+
 permalinks:
   posts: "/:slug/"
 
-# 菜单配置
 menu:
   main:
     - name: 首页
@@ -23,7 +26,6 @@ menu:
       url: /archives/
       weight: 40
 
-# Hugo 图片处理配置
 imaging:
   quality: 75
   resampleFilter: "Lanczos"
@@ -37,17 +39,14 @@ params:
   ShowToc: true
   ShowBreadCrumbs: true
 
-  # 首页配置
   homeInfoParams:
     Title: "你好，欢迎来访"
     Content: "这里是东雲研究所，记录学习与生活"
 
-  # 社交链接
   socialIcons:
     - name: github
       url: "https://github.com/electq"
 
-  # 搜索配置
   fuseOpts:
     isCaseSensitive: false
     shouldSort: true
@@ -57,6 +56,5 @@ params:
     minMatchCharLength: 0
     keys: ["title", "permalink", "summary", "content"]
 
-  # 封面图配置
   cover:
     linkFullImages: true
