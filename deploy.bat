@@ -1,10 +1,9 @@
 @echo off
 setlocal EnableDelayedExpansion
 
-for /f "tokens=1-6 delims=/:. " %%a in ("%date% %time%") do (
-    set "datetime=%%a-%%b-%%c-%%d-%%e"
-)
-set "msg=%datetime%"
+REM Get datetime format YYYY-MM-DD-HH-MM
+for /f %%i in ('wmic os get LocalDateTime ^| find "."') do set dt=%%i
+set msg=%dt:~0,4%-%dt:~4,2%-%dt:~6,2%-%dt:~8,2%-%dt:~10,2%
 
 echo.
 echo [1/6] Building Hugo site...
@@ -18,35 +17,14 @@ if errorlevel 1 (
 echo.
 echo [2/6] Fetching remote changes...
 git fetch origin main
-if errorlevel 1 (
-    echo [WARN] Fetch failed, continuing...
-)
 
 echo.
-echo [3/6] Checking for local changes to stash...
-git diff --quiet HEAD
-if errorlevel 1 (
-    echo [INFO] Stashing local changes...
-    git stash push -m "Auto-stash before rebase"
-    set "stashed=1"
-) else (
-    echo [INFO] No local changes to stash.
-    set "stashed=0"
-)
-
-echo.
-echo [4/6] Rebasing on remote...
+echo [3/6] Rebasing on remote...
 git rebase origin/main
 if errorlevel 1 (
-    echo.
     echo [ERROR] Rebase failed! There might be conflicts.
     echo [INFO] Aborting rebase...
-    git rebase --abort 2>nul
-    if "!stashed!"=="1" (
-        echo [INFO] Restoring stashed changes...
-        git stash pop 2>nul
-    )
-    echo.
+    git rebase --abort
     echo Please resolve conflicts manually:
     echo   1. git pull origin main
     echo   2. Resolve conflicts
@@ -55,39 +33,31 @@ if errorlevel 1 (
     exit /b 1
 )
 
-if "!stashed!"=="1" (
-    echo.
-    echo [5/6] Restoring stashed changes...
-    git stash pop 2>nul
-    if errorlevel 1 (
-        git status --porcelain | findstr "^UU" >nul
-        if errorlevel 1 (
-            echo [INFO] Stash pop completed.
-        ) else (
-            echo [ERROR] Conflicts detected after stash pop!
-            echo Please resolve conflicts manually.
-            pause
-            exit /b 1
-        )
+echo.
+echo [4/6] Checking stash...
+git stash list | findstr "Auto-stash" >nul
+if not errorlevel 1 (
+    echo [INFO] Restoring stashed changes...
+    git stash pop
+    git status --porcelain | findstr "^UU" >nul
+    if not errorlevel 1 (
+        echo [ERROR] Conflicts detected after stash pop!
+        echo Please resolve conflicts manually.
+        pause
+        exit /b 1
     )
 ) else (
-    echo.
-    echo [5/6] No stash to restore.
+    echo [INFO] No stash to restore.
 )
 
 echo.
-echo [6/6] Adding and committing changes...
+echo [5/6] Adding and committing changes...
 git add -A
 
 git diff --quiet --cached
 if errorlevel 1 (
-    git commit -m "%msg%"
-    if errorlevel 1 (
-        echo [ERROR] Git commit failed!
-        pause
-        exit /b 1
-    )
-    echo [INFO] Committed: %msg%
+    git commit -m "!msg!"
+    echo [INFO] Committed: !msg!
 ) else (
     echo [INFO] No changes to commit.
 )
@@ -96,9 +66,7 @@ echo.
 echo [PUSH] Pushing to GitHub...
 git push origin main
 if errorlevel 1 (
-    echo.
-    echo [ERROR] Push failed! Remote might have new commits.
-    echo [INFO] Try running this script again.
+    echo [ERROR] Push failed! Try running again.
     pause
     exit /b 1
 )

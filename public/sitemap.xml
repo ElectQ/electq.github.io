@@ -2,27 +2,27 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
   xmlns:xhtml="http://www.w3.org/1999/xhtml">
   <url>
-    <loc>http://localhost:1313/categories/</loc>
+    <loc>https://electq.github.io/categories/</loc>
     <lastmod>2026-04-29T16:18:50+08:00</lastmod>
   </url><url>
-    <loc>http://localhost:1313/posts/</loc>
+    <loc>https://electq.github.io/posts/</loc>
     <lastmod>2026-04-29T16:18:50+08:00</lastmod>
   </url><url>
-    <loc>http://localhost:1313/start/</loc>
+    <loc>https://electq.github.io/start/</loc>
     <lastmod>2026-04-29T16:18:50+08:00</lastmod>
   </url><url>
-    <loc>http://localhost:1313/tags/</loc>
+    <loc>https://electq.github.io/tags/</loc>
     <lastmod>2026-04-29T16:18:50+08:00</lastmod>
   </url><url>
-    <loc>http://localhost:1313/</loc>
+    <loc>https://electq.github.io/</loc>
     <lastmod>2026-04-29T16:18:50+08:00</lastmod>
   </url><url>
-    <loc>http://localhost:1313/tags/%E7%94%9F%E6%B4%BB/</loc>
+    <loc>https://electq.github.io/tags/%E7%94%9F%E6%B4%BB/</loc>
     <lastmod>2026-04-29T16:18:50+08:00</lastmod>
   </url><url>
-    <loc>http://localhost:1313/categories/%E9%9A%8F%E7%AC%94/</loc>
+    <loc>https://electq.github.io/categories/%E9%9A%8F%E7%AC%94/</loc>
     <lastmod>2026-04-29T16:18:50+08:00</lastmod>
   </url><url>
-    <loc>http://localhost:1313/archives/</loc>
+    <loc>https://electq.github.io/archives/</loc>
   </url>
 </urlset>
