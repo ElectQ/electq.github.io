@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:content="http://purl.org/rss/1.0/modules/content/">
+  <channel>
+    <title>东雲研究所</title>
+    <link>https://electq.github.io/</link>
+    <description>Recent content on 东雲研究所</description>
+    <generator>Hugo</generator>
+    <language>zh-cn</language>
+    <lastBuildDate>Wed, 29 Apr 2026 16:18:50 +0800</lastBuildDate>
+    <atom:link href="https://electq.github.io/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Start</title>
+      <link>https://electq.github.io/start/</link>
+      <pubDate>Wed, 29 Apr 2026 16:18:50 +0800</pubDate>
+      <guid>https://electq.github.io/start/</guid>
+      <description>博客的第一篇文章，记录开始</description>
+    </item>
+  </channel>
+</rss>
