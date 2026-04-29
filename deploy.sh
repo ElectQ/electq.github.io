@@ -5,7 +5,7 @@ msg="$datetime"
 
 echo ""
 echo "[1/6] Building Hugo site..."
-hugo
+hugo 2>/dev/null
 if [ $? -ne 0 ]; then
     echo "[ERROR] Hugo build failed!"
     exit 1
@@ -13,43 +13,31 @@ fi
 
 echo ""
 echo "[2/6] Fetching remote changes..."
-git fetch origin main
+git fetch origin main 2>/dev/null
 
 echo ""
-echo "[3/6] Rebasing on remote..."
-git rebase origin/main
+echo "[3/6] Stashing local changes..."
+git stash 2>/dev/null
+
+echo ""
+echo "[4/6] Rebasing on remote..."
+git rebase origin/main 2>/dev/null
 if [ $? -ne 0 ]; then
-    echo "[ERROR] Rebase failed! There might be conflicts."
-    echo "[INFO] Aborting rebase..."
-    git rebase --abort
-    echo ""
-    echo "Please resolve conflicts manually:"
-    echo "  1. git pull origin main"
-    echo "  2. Resolve conflicts"
-    echo "  3. Run this script again"
+    echo "[ERROR] Rebase failed!"
+    git rebase --abort 2>/dev/null
+    git stash pop 2>/dev/null
     exit 1
 fi
 
 echo ""
-echo "[4/6] Checking stash..."
-if git stash list | grep -q "Auto-stash"; then
-    echo "[INFO] Restoring stashed changes..."
-    git stash pop
-    if git status --porcelain | grep -q "^UU"; then
-        echo "[ERROR] Conflicts detected after stash pop!"
-        echo "Please resolve conflicts manually."
-        exit 1
-    fi
-else
-    echo "[INFO] No stash to restore."
-fi
+echo "[5/6] Restoring stashed changes..."
+git stash pop 2>/dev/null
 
 echo ""
-echo "[5/6] Adding and committing changes..."
+echo "[6/6] Adding and committing changes..."
 git add -A
-
-if [ -n "$(git diff --cached --name-only)" ]; then
-    git commit -m "$msg"
+if [ -n "$(git diff --cached --name-only 2>/dev/null)" ]; then
+    git commit -m "$msg" 2>/dev/null
     echo "[INFO] Committed: $msg"
 else
     echo "[INFO] No changes to commit."
@@ -59,7 +47,7 @@ echo ""
 echo "[PUSH] Pushing to GitHub..."
 git push origin main
 if [ $? -ne 0 ]; then
-    echo "[ERROR] Push failed! Try running again."
+    echo "[ERROR] Push failed!"
     exit 1
 fi
 
