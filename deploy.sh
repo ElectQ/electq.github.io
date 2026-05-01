@@ -1,47 +1,48 @@
-#!/bin/bash
+#!/usr/bin/env bash
+set -euo pipefail
 
-datetime=$(date "+%Y-%m-%d-%H-%M")
-msg="$datetime"
+msg="$(date "+%Y-%m-%d-%H-%M")"
 
-echo ""
-echo "[1/5] Building Hugo site..."
-hugo 2>/dev/null
-if [ $? -ne 0 ]; then
-    echo "[ERROR] Hugo build failed!"
+need_cmd() {
+    if ! command -v "$1" >/dev/null 2>&1; then
+        echo "[ERROR] Missing required command: $1" >&2
+        exit 1
+    fi
+}
+
+step() {
+    echo ""
+    echo "[$1/5] $2"
+}
+
+need_cmd git
+need_cmd hugo
+
+branch="$(git branch --show-current)"
+if [ "$branch" != "main" ]; then
+    echo "[ERROR] Deploy must run from the main branch. Current branch: $branch" >&2
     exit 1
 fi
 
-echo ""
-echo "[2/5] Adding and committing changes..."
+step 1 "Syncing with origin/main..."
+git pull --rebase --autostash origin main
+
+step 2 "Building Hugo site..."
+hugo
+
+step 3 "Adding and committing changes..."
 git add -A
-if [ -n "$(git diff --cached --name-only 2>/dev/null)" ]; then
-    git commit -m "$msg" 2>/dev/null
+if [ -n "$(git diff --cached --name-only)" ]; then
+    git commit -m "$msg"
     echo "[INFO] Committed: $msg"
 else
     echo "[INFO] No changes to commit."
 fi
 
-echo ""
-echo "[3/5] Fetching remote changes..."
-git fetch origin main 2>/dev/null
-
-echo ""
-echo "[4/5] Rebasing on remote..."
-git rebase origin/main 2>/dev/null
-if [ $? -ne 0 ]; then
-    echo "[ERROR] Rebase failed!"
-    git rebase --abort 2>/dev/null
-    exit 1
-fi
-
-echo ""
-echo "[5/5] Pushing to GitHub..."
+step 4 "Pushing to GitHub..."
 git push origin main
-if [ $? -ne 0 ]; then
-    echo "[ERROR] Push failed!"
-    exit 1
-fi
 
+step 5 "Done."
 echo ""
 echo "============================================"
 echo "[SUCCESS] Blog updated and pushed to GitHub!"

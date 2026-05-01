@@ -1,51 +1,70 @@
-$datetime = Get-Date -Format "yyyy-MM-dd-HH-mm"
-$msg = $datetime
+$ErrorActionPreference = "Stop"
 
-Write-Host ""
-Write-Host "[1/5] Building Hugo site..." -ForegroundColor Cyan
-& hugo 2>&1 | Where-Object { $_ -isnot [System.Management.Automation.ErrorRecord] } | Out-Default
-if ($LASTEXITCODE -ne 0) {
-    Write-Host "[ERROR] Hugo build failed!" -ForegroundColor Red
+$msg = Get-Date -Format "yyyy-MM-dd-HH-mm"
+
+function Step($Number, $Text) {
+    Write-Host ""
+    Write-Host "[$Number/5] $Text" -ForegroundColor Cyan
+}
+
+function Invoke-Checked($Command, [string[]]$Arguments = @()) {
+    & $Command @Arguments
+    if ($LASTEXITCODE -ne 0) {
+        throw "Command failed with exit code ${LASTEXITCODE}: $Command $($Arguments -join ' ')"
+    }
+}
+
+function Require-Command($Command) {
+    if (-not (Get-Command $Command -ErrorAction SilentlyContinue)) {
+        throw "Missing required command: $Command"
+    }
+}
+
+try {
+    Require-Command "git"
+    Require-Command "hugo"
+
+    $branch = (& git branch --show-current).Trim()
+    if ($LASTEXITCODE -ne 0) {
+        throw "Unable to determine current git branch."
+    }
+    if ($branch -ne "main") {
+        throw "Deploy must run from the main branch. Current branch: $branch"
+    }
+
+    Step 1 "Syncing with origin/main..."
+    Invoke-Checked "git" @("pull", "--rebase", "--autostash", "origin", "main")
+
+    Step 2 "Building Hugo site..."
+    Invoke-Checked "hugo" @()
+
+    Step 3 "Adding and committing changes..."
+    Invoke-Checked "git" @("add", "-A")
+    $staged = & git diff --cached --name-only
+    if ($LASTEXITCODE -ne 0) {
+        throw "Unable to inspect staged changes."
+    }
+
+    if ($staged) {
+        Invoke-Checked "git" @("commit", "-m", $msg)
+        Write-Host "[INFO] Committed: $msg" -ForegroundColor Yellow
+    } else {
+        Write-Host "[INFO] No changes to commit." -ForegroundColor Yellow
+    }
+
+    Step 4 "Pushing to GitHub..."
+    Invoke-Checked "git" @("push", "origin", "main")
+
+    Step 5 "Done."
+    Write-Host ""
+    Write-Host "============================================" -ForegroundColor Green
+    Write-Host "[SUCCESS] Blog updated and pushed to GitHub!" -ForegroundColor Green
+    Write-Host "============================================" -ForegroundColor Green
+} catch {
+    Write-Host ""
+    Write-Host "[ERROR] $($_.Exception.Message)" -ForegroundColor Red
     Read-Host "Press Enter to exit"
     exit 1
 }
 
-Write-Host ""
-Write-Host "[2/5] Adding and committing changes..." -ForegroundColor Cyan
-& git add -A
-$staged = git diff --cached --name-only 2>&1
-if ($staged) {
-    & git commit -m $msg *>&1 | Out-Null
-    Write-Host "[INFO] Committed: $msg" -ForegroundColor Yellow
-} else {
-    Write-Host "[INFO] No changes to commit." -ForegroundColor Yellow
-}
-
-Write-Host ""
-Write-Host "[3/5] Fetching remote changes..." -ForegroundColor Cyan
-& git fetch origin main *>&1 | Out-Null
-
-Write-Host ""
-Write-Host "[4/5] Rebasing on remote..." -ForegroundColor Cyan
-& git rebase origin/main *>&1 | Out-Null
-if ($LASTEXITCODE -ne 0) {
-    Write-Host "[ERROR] Rebase failed!" -ForegroundColor Red
-    & git rebase --abort *>&1 | Out-Null
-    Read-Host "Press Enter to exit"
-    exit 1
-}
-
-Write-Host ""
-Write-Host "[5/5] Pushing to GitHub..." -ForegroundColor Cyan
-& git push origin main *>&1 | Where-Object { $_ -isnot [System.Management.Automation.ErrorRecord] } | Out-Default
-if ($LASTEXITCODE -ne 0) {
-    Write-Host "[ERROR] Push failed!" -ForegroundColor Red
-    Read-Host "Press Enter to exit"
-    exit 1
-}
-
-Write-Host ""
-Write-Host "============================================" -ForegroundColor Green
-Write-Host "[SUCCESS] Blog updated and pushed to GitHub!" -ForegroundColor Green
-Write-Host "============================================" -ForegroundColor Green
 Read-Host "Press Enter to exit"
