@@ -9,7 +9,7 @@ languages:
     weight: 1
 
 permalinks:
-  posts: "/:slug/"
+  posts: "/posts/:slug/"
 
 menu:
   main:

@@ -1,0 +1,5 @@
+{{- $dest := .Destination -}}
+{{- if and (not (hasPrefix $dest "http")) (not (hasPrefix $dest "/")) -}}
+  {{- $dest = printf "/%s%s" .Page.File.Dir (strings.TrimPrefix "./" $dest) -}}
+{{- end -}}
+<img src="{{ $dest }}" alt="{{ .Text }}"{{ with .Title }} title="{{ . }}"{{ end }}>
