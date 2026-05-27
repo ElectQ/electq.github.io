@@ -1,8 +1,8 @@
 ---
 title: "从 Typora 到 Hugo：一次写作发布工作流的重构小记"
 slug: "workflow-design-notes"
-date: "2026-05-27T20:45:05+08:00"
-lastmod: "2026-05-27T20:45:05+08:00"
+date: "2026-05-27T21:21:18+08:00"
+lastmod: "2026-05-27T21:21:18+08:00"
 draft: false
 tags: ["Workflow", "工程设计"]
 categories: ["日常"]
