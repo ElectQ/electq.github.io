@@ -1,8 +1,8 @@
 ---
 title: "Claude Code源码阅读-QueryEngine篇"
 slug: "Claude-Code源码阅读-QueryEngine篇"
-date: "2026-05-28T21:37:19+08:00"
-lastmod: "2026-05-28T21:37:19+08:00"
+date: "2026-05-28T21:46:33+08:00"
+lastmod: "2026-05-28T21:46:33+08:00"
 draft: false
 tags: ["Workflow", "工程设计", "读后感"]
 categories: ["AI"]
@@ -107,7 +107,7 @@ async *submitMessage(
 
 第二件事，是把权限检查包一层。`canUseTool` 原本只是“判断能不能调用工具”的函数，但 `submitMessage()` 不直接透传给下游，而是包成 `wrappedCanUseTool`：如果工具被拒绝，就把拒绝记录进 `permissionDenials`。这说明权限系统在 Claude Code 里不是临时弹窗，而是会话审计的一部分。
 
-![ChatGPT Image 2026年5月28日 16_39_03](./images/ChatGPT Image 2026年5月28日 16_39_03.png)
+![ChatGPT Image 2026年5月28日 16_39_03](./images/ChatGPT%20Image%202026年5月28日%2016_39_03.png)
 
 第三件事，是确定本轮的模型与提示词环境。这里会先拿到 `initialAppState`，再确定这次的 `mainLoopModel` 与 `thinkingConfig`，然后通过 `fetchSystemPromptParts(...)` 获取三类材料：
 
@@ -117,7 +117,7 @@ async *submitMessage(
 
 这些名字乍看像“准备 prompt”，但本质上是在准备会话运行的制度环境。工具、MCP 客户端、额外工作目录、custom prompt、memory mechanics prompt、appendSystemPrompt 都会在这一层被合并进去。Claude Code 不是在临门一脚把一段 prompt 拼出来，而是在模型调用前先把“这次对话所处的世界”组织出来。
 
-![ChatGPT Image 2026年5月28日 16_47_35](./images/ChatGPT Image 2026年5月28日 16_47_35.png)
+![ChatGPT Image 2026年5月28日 16_47_35](./images/ChatGPT%20Image%202026年5月28日%2016_47_35.png)
 
 第四件事，是构造 `processUserInputContext`。这是一个非常关键、也很容易被忽略的对象。它不是普通参数包，而是“处理用户输入时可用的整套上下文工具箱”。里面除了消息列表和工具/命令集合，还放进了：
 
@@ -204,7 +204,7 @@ for await (const message of query({
 
 这一段是整条调用链的下潜时刻。前面所有准备动作，都是为了把一个“已经具备上下文、权限、恢复能力和状态边界的会话快照”交给 `query()`。从这里开始，上层编排暂时退后，下面真正进入 Agent 执行循环。
 
-![ChatGPT Image 2026年5月28日 17_14_10](./images/ChatGPT Image 2026年5月28日 17_14_10.png)
+![ChatGPT Image 2026年5月28日 17_14_10](./images/ChatGPT%20Image%202026年5月28日%2017_14_10.png)
 
 还要特别注意一点：即使到了整个 `submitMessage()` 的末尾，最终结果也仍然不是通过 `return` 返回给调用方，而是通过 `yield { type: 'result', ... }` 作为事件流中的最后一条消息发出去。这说明最终结果不是脱离过程的特殊出口，而是统一事件协议的一部分。
 
