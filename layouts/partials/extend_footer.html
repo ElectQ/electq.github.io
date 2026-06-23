@@ -1,0 +1,14 @@
+{{- /* KaTeX 渲染初始化 — 必须放在 DOMContentLoaded 以确保 defer 脚本已加载 */ -}}
+{{- if or .Params.math .Site.Params.math }}
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    renderMathInElement(document.body, {
+      delimiters: [
+        {left: '$$', right: '$$', display: true},
+        {left: '$', right: '$', display: false}
+      ],
+      throwOnError: false
+    });
+  });
+</script>
+{{- end }}
