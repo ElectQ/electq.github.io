@@ -1,14 +1,4 @@
-{{- /* KaTeX 渲染初始化 — 必须放在 DOMContentLoaded 以确保 defer 脚本已加载 */ -}}
-{{- if or .Params.math .Site.Params.math }}
-<script>
-  document.addEventListener('DOMContentLoaded', function() {
-    renderMathInElement(document.body, {
-      delimiters: [
-        {left: '$$', right: '$$', display: true},
-        {left: '$', right: '$', display: false}
-      ],
-      throwOnError: false
-    });
-  });
-</script>
+{{- /* 此文件保留用于未来扩展，KaTeX 初始化已移至 extend_head.html 的 onload */ -}}
+{{- if .Params.custom_footer }}
+{{ .Params.custom_footer | safeHTML }}
 {{- end }}

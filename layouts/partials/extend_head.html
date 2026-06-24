@@ -1,12 +1,19 @@
-{{- /* KaTeX 数学公式渲染 */ -}}
-{{- if or .Params.math .Site.Params.math }}
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css" integrity="sha384-n8MVd4RsNIU0t8KR2k2cXJ9xPP3SxJpHs5rUUu4fDf4F09XbMJEgFJw4JGqJ6R6" crossorigin="anonymous">
-<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js" integrity="sha384-XjKyOOlGwcjNTAIQHIpgONo05bHcq3I79osFRs+9FYXJ3e4Rj1o6PHo0Y4GC/gw" crossorigin="anonymous"></script>
-<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js" integrity="sha384-+VBxd3r6XgURycqtZ117nYw44OOcIax56Z4dCRWbxyPt0Koah1uHoK0o4+/RRE05" crossorigin="anonymous"></script>
+{{- /* 自动检测数学公式并加载 KaTeX */ -}}
+{{- if or .Params.math (findRE `\$.*\$` .Content) }}
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css" crossorigin="anonymous">
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js" crossorigin="anonymous"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js" crossorigin="anonymous"
+    onload="renderMathInElement(document.body, {
+        delimiters: [
+            {left: '$$', right: '$$', display: true},
+            {left: '$', right: '$', display: false}
+        ],
+        throwOnError: false
+    });"></script>
 {{- end }}
 
-{{- /* Mermaid 图表渲染 */ -}}
-{{- if or .Params.mermaid .Site.Params.mermaid }}
+{{- /* 自动检测 Mermaid 图表并加载 */ -}}
+{{- if or .Params.mermaid (findRE `class=\"mermaid\"` .Content) }}
 <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
 <script>mermaid.initialize({ startOnLoad: true });</script>
 {{- end }}

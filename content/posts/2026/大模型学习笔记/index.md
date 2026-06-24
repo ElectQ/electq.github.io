@@ -191,7 +191,7 @@ $$Logits = \begin{bmatrix} 2 & 0 & 16 & 4 \end{bmatrix} \quad \text{(形状: } 1
 
 由于 $e^{16}$ 远大于其他项，"AI"对应的概率将接近 1：
 
-$$P = \begin{bmatrix} 0.0001\text{%} & 0.0000\text{%} & 99.99\text{%} & 0.006\text{%} \end{bmatrix}$$
+$$P = \begin{bmatrix} 0.0001\text{\%} & 0.0000\text{\%} & 99.99\text{\%} & 0.006\text{\%} \end{bmatrix}$$
 
 **结果**
 
